@@ -1,0 +1,49 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup
+      run: sudo apt-get install g++ clang lcov -y
+      
+    - name: Check lcov
+      run: lcov --version
+      
+    
+    - name: Clean
+      working-directory: ${{github.workspace}}/cli_example
+      run: bash clean.sh
+    - name: Build with GCC
+      working-directory: ${{github.workspace}}/cli_example
+      run: bash build_with_gcc.sh
+    - name: RUN main.bin.gcc
+      working-directory: ${{github.workspace}}/cli_example
+      run: ./main.bin.gcc
+    - name: Generate Cov
+      working-directory: ${{github.workspace}}/cli_example
+      run: bash cov.sh
+  
+    - name: Clean
+      working-directory: ${{github.workspace}}/cli_example
+      run: bash clean.sh
+    - name: Build with Clang
+      working-directory: ${{github.workspace}}/cli_example
+      run: bash build_with_clang.sh
+    - name: RUN main.bin.clang
+      working-directory: ${{github.workspace}}/cli_example
+      run: ./main.bin.clang
+    - name: Generate Cov
+      working-directory: ${{github.workspace}}/cli_example
+      run: bash cov.sh
+    

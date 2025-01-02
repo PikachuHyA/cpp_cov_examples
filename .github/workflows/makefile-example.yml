@@ -1,0 +1,49 @@
+name: Makefile Example
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-22.04
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup
+      run: sudo apt-get install g++ clang lcov -y
+      
+    - name: Check lcov
+      run: lcov --version
+      
+    
+    - name: Clean
+      working-directory: ${{github.workspace}}/makefile_example
+      run: make clean
+    - name: Build with GCC
+      working-directory: ${{github.workspace}}/makefile_example
+      run: CC=gcc make
+    - name: RUN main.bin.gcc
+      working-directory: ${{github.workspace}}/makefile_example
+      run: ./src/main.bin.gcc
+    - name: Generate Cov
+      working-directory: ${{github.workspace}}/makefile_example
+      run: make -C codecoverage report
+  
+    - name: Clean
+      working-directory: ${{github.workspace}}/makefile_example
+      run: make clean
+    - name: Build with Clang
+      working-directory: ${{github.workspace}}/makefile_example
+      run: CC=clang make
+    - name: RUN main.bin.clang
+      working-directory: ${{github.workspace}}/makefile_example
+      run: ./src/main.bin.clang
+    - name: Generate Cov
+      working-directory: ${{github.workspace}}/makefile_example
+      run: make -C codecoverage report
+    

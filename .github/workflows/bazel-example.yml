@@ -1,0 +1,63 @@
+name: Bazel Example
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup
+      run: sudo apt-get install g++ clang lcov -y
+    - name: Run with GCC
+      working-directory: ${{github.workspace}}/bazel_example
+      run: bazel coverage ... --combined_report=lcov --action_env=CC=gcc
+    - name: genhtml
+      working-directory: ${{github.workspace}}/bazel_example
+      run: genhtml -o genhtml bazel-out/_coverage/_coverage_report.dat
+    - name: Upload bazel
+      uses: actions/upload-artifact@v4
+      with:
+        name: bazel_cov_gcc
+        path: |
+          genhtml
+    - name: Clean
+      working-directory: ${{github.workspace}}/bazel_example
+      run: |
+        bazel clean
+        rm -rf genhtml
+    - name: Run with Clang --coverage
+      working-directory: ${{github.workspace}}/bazel_example
+      run: bazel coverage ... --combined_report=lcov --action_env=CC=clang
+    - name: genhtml
+      working-directory: ${{github.workspace}}/bazel_example
+      run: genhtml -o genhtml bazel-out/_coverage/_coverage_report.dat
+    - name: Upload bazel
+      uses: actions/upload-artifact@v4
+      with:
+        name: bazel_cov_clang
+        path: |
+          genhtml
+    - name: Clean
+      working-directory: ${{github.workspace}}/bazel_example
+      run: |
+        bazel clean
+        rm -rf genhtml
+    - name: Run with Clang -fprofile-instr-generate
+      working-directory: ${{github.workspace}}/bazel_example
+      run: bazel coverage ... --combined_report=lcov --action_env=CC=clang --repo_env=BAZEL_USE_LLVM_NATIVE_COVERAGE=1 --experimental_generate_llvm_lcov
+    - name: genhtml
+      working-directory: ${{github.workspace}}/bazel_example
+      run: genhtml -o genhtml bazel-out/_coverage/_coverage_report.dat
+    - name: Upload bazel
+      uses: actions/upload-artifact@v4
+      with:
+        name: bazel_cov_clang2
+        path: |
+          genhtml

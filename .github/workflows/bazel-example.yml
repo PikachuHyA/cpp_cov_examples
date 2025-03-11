@@ -32,18 +32,7 @@ jobs:
       run: |
         bazel clean
         rm -rf genhtml
-    - name: Run with Clang --coverage
-      working-directory: ${{github.workspace}}/bazel_example
-      run: bazel coverage ... --combined_report=lcov --action_env=CC=clang
-    - name: genhtml
-      working-directory: ${{github.workspace}}/bazel_example
-      run: genhtml -o genhtml bazel-out/_coverage/_coverage_report.dat
-    - name: Upload bazel
-      uses: actions/upload-artifact@v4
-      with:
-        name: bazel_cov_clang
-        path: |
-          genhtml
+        
     - name: Clean
       working-directory: ${{github.workspace}}/bazel_example
       run: |
@@ -59,5 +48,17 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: bazel_cov_clang2
+        path: |
+          genhtml
+    - name: Run with Clang --coverage
+      working-directory: ${{github.workspace}}/bazel_example
+      run: bazel coverage ... --combined_report=lcov --action_env=CC=clang
+    - name: genhtml
+      working-directory: ${{github.workspace}}/bazel_example
+      run: genhtml -o genhtml bazel-out/_coverage/_coverage_report.dat
+    - name: Upload bazel
+      uses: actions/upload-artifact@v4
+      with:
+        name: bazel_cov_clang
         path: |
           genhtml
